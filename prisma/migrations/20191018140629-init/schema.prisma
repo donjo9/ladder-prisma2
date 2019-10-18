@@ -1,0 +1,41 @@
+generator photon {
+  provider = "photonjs"
+}
+
+datasource db {
+  provider = "sqlite"
+  url = "***"
+}
+
+model User {
+    id         String   @default(cuid()) @id @unique
+    name       String
+    email      String   @unique
+    playercode String   @unique
+    password   String
+    updatedAt  DateTime @updatedAt
+    createdAt  DateTime @default(now())
+    ownTeam    Team? @relation(name: "TeamToOwner", onDelete: CASCADE)
+    team       Team? @relation(name: "TeamToPlayer")
+    teamInvitations TeamInvitation[]
+}
+
+
+model Team {
+    id        String   @default(cuid()) @id @unique
+    name      String
+    shortname String
+    teamcode  String   @unique
+    updatedAt DateTime @updatedAt
+    createdAt DateTime @default(now())
+    points    Int      @default(value: 1000)
+    owner     User     @relation(references: [id], name: "TeamToOwner")
+    players   User[]   @relation(references: [id], name: "TeamToPlayer")
+    playerInvitations TeamInvitation[]
+}
+
+model TeamInvitation {
+    id  String @default(cuid()) @id @unique
+    player User
+    team Team
+}
